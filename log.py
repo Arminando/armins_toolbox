@@ -1,5 +1,6 @@
-import logging
-import sys
+import logging, sys, functools, os
+from inspect import getframeinfo, stack
+from typing import Union
 import bpy
 
 class _CustomFormatter(logging.Formatter):
@@ -26,8 +27,9 @@ except:
 file_handler = logging.FileHandler("armins_toolbox.log")
 stream_handler = logging.StreamHandler(sys.stdout)
 
-file_handler.setFormatter(_CustomFormatter('%(asctime)s - %(levelname)-10s - %(filename)s - %(funcName)s, l.%(lineno)d - %(message)s'))
-stream_handler.setFormatter(_CustomFormatter('%(asctime)s - %(levelname)-10s - %(filename)s - %(funcName)s, l.%(lineno)d - %(message)s'))
+default_formatter = _CustomFormatter('%(asctime)s - %(levelname)-10s - %(filename)s - %(funcName)s, l.%(lineno)d - %(message)s')
+file_handler.setFormatter(default_formatter)
+stream_handler.setFormatter(default_formatter)
 
 logger.handlers.clear()
 logger.addHandler(file_handler)
@@ -42,3 +44,28 @@ def set_log_level(value):
 
 def get_log_level():
     return __log_level
+
+# Function decorator to log function details
+def log(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        args_repr = [repr(a) for a in args]
+        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        py_file_caller = getframeinfo(stack()[1][0])
+        file_handler.setFormatter(_CustomFormatter('%(asctime)s - %(levelname)-10s - %(message)s'))
+        stream_handler.setFormatter(_CustomFormatter('%(asctime)s - %(levelname)-10s - %(message)s'))
+        logger.debug(f"{os.path.basename(py_file_caller.filename)} - {func.__name__} - Args: {signature}")
+        try:
+            result = func(*args, **kwargs)
+            logger.debug(f"Returned: {result!r}")
+            file_handler.setFormatter(default_formatter)
+            stream_handler.setFormatter(default_formatter)
+            return result
+        except Exception as e:
+            file_handler.setFormatter(default_formatter)
+            stream_handler.setFormatter(default_formatter)
+            logger.exception(f"Exception raised in {func.__name__}. Exception: {str(e)}")
+            raise e
+
+    return wrapper

@@ -13,21 +13,21 @@ bl_info = {
 
 if "bpy" in locals():
     import importlib
+    importlib.reload(preferences)
     importlib.reload(log)
     importlib.reload(utils)
     utils.bl_class_registry.BlClassRegistry.cleanup()
     importlib.reload(op)
     importlib.reload(ui)
     importlib.reload(properties)
-    importlib.reload(preferences)
 else:
     import bpy
+    from . import preferences
     from . import log
     from . import utils
     from . import op
     from . import ui
     from . import properties
-    from . import preferences
 
 import bpy
 

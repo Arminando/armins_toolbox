@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 import bpy
 from bpy.props import BoolProperty
-from ..log import logger
+from ..log import logger, log
 
 from ..utils.bl_class_registry import BlClassRegistry
 from ..utils.property_class_registry import PropertyClassRegistry
@@ -66,5 +66,11 @@ class AT_OT_Operator_Template(bpy.types.Operator):
         # Write to that custom prop if needed to pass info to other operators.
         props.test_prop = None
         logger.debug("Operator executed successfully.")
+        log_test(1, b=2)
 
         return {'FINISHED'}
+
+
+@log
+def log_test(a, b=10):
+    return a+b
