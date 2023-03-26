@@ -52,7 +52,7 @@ class AT_Preferences(AddonPreferences):
                ('WARNING', 'WARNING', 'WARNING', 30),
                ('ERROR', 'ERROR', 'ERROR', 40),
                ('CRITICAL', 'CRITICAL', 'CRITICAL', 50)),
-        default = 'INFO',
+        default = 'DEBUG',
 
     )
 

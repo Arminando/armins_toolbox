@@ -63,9 +63,9 @@ def log(func):
             stream_handler.setFormatter(default_formatter)
             return result
         except Exception as e:
+            logger.exception(f"Exception raised in {func.__name__}. Exception: {str(e)}")
             file_handler.setFormatter(default_formatter)
             stream_handler.setFormatter(default_formatter)
-            logger.exception(f"Exception raised in {func.__name__}. Exception: {str(e)}")
             raise e
 
     return wrapper
